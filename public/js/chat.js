@@ -1,15 +1,22 @@
 const socket = io();
-const $messageForm = document.querySelector("#formChat");
-const $messageFormInput = $messageForm.querySelector(".textInput");
-const $messageFormButton = $messageForm.querySelector(".submitBtn");
-const $sendLocationButton = document.querySelector(".sendLocation");
-const $messages = document.querySelector("#message");
+const $messageForm = document.querySelector("#message-form");
+const $messageFormInput = $messageForm.querySelector("input");
+const $messageFormButton = $messageForm.querySelector("button");
+const $sendLocationButton = document.querySelector("#send-location");
+const $messages = document.querySelector("#messages");
+
+/**get query param from url */
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
 
 /**Template */
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 const locationTemplate = document.querySelector(
   "#location-message-template"
 ).innerHTML;
+
+socket.emit("join", { username, room });
 
 socket.on("message", (message) => {
   console.log(message);
@@ -44,7 +51,10 @@ socket.on("updatedText", (message) => {
 
 socket.on("locationMessage", (locationLink) => {
   // console.log(locationText);
-  const html = Mustache.render(locationTemplate, { locationLink });
+  const html = Mustache.render(locationTemplate, {
+    locationLink: locationLink.location,
+    createdAt: moment(locationLink.createdAt).format("h:m a"),
+  });
   $messages.insertAdjacentHTML("beforeend", html);
 });
 
