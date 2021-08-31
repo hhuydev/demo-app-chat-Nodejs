@@ -3,15 +3,27 @@ const $messageForm = document.querySelector("#formChat");
 const $messageFormInput = $messageForm.querySelector(".textInput");
 const $messageFormButton = $messageForm.querySelector(".submitBtn");
 const $sendLocationButton = document.querySelector(".sendLocation");
+const $messages = document.querySelector("#message");
 
-socket.on("message", (message) => console.log(message));
+/**Template */
+const messageTemplate = document.querySelector("#message-template").innerHTML;
+const locationTemplate = document.querySelector(
+  "#location-message-template"
+).innerHTML;
+
+socket.on("message", (message) => {
+  console.log(message);
+  /**Dung mustache de render message ra html */
+  const html = Mustache.render(messageTemplate, {
+    message: message.text,
+    /**Format ngay thang nam bang thu vien Moment */
+    createdAt: moment(message.createdAt).format("h:m a"),
+  });
+  $messages.insertAdjacentHTML("beforeend", html);
+});
 
 $messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  // if ($messageFormInput.value === "") {
-  //   $messageFormButton.setAttribute("disabled", "disabled");
-  //   return;
-  // }
   $messageFormButton.setAttribute("disabled", "disabled");
   /**get gia tri input bang thuoc tinh name trong form */
   const mytext = e.target.textMessage.value;
@@ -28,6 +40,12 @@ $messageForm.addEventListener("submit", (e) => {
 socket.on("updatedText", (message) => {
   if (!message) return;
   console.log("This text has been arrived");
+});
+
+socket.on("locationMessage", (locationLink) => {
+  // console.log(locationText);
+  const html = Mustache.render(locationTemplate, { locationLink });
+  $messages.insertAdjacentHTML("beforeend", html);
 });
 
 $sendLocationButton.addEventListener("click", () => {

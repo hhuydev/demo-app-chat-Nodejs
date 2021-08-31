@@ -4,6 +4,7 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
+const { generateMessage } = require("./utils/message");
 
 const port = process.env.PORT || 3000;
 const publicDirectoryPath = path.join(__dirname, "../public");
@@ -21,7 +22,7 @@ io.on("connection", (socket) => {
   console.log("Websocket is running!");
 
   /**Gửi cho 1 client*/
-  socket.emit("message", "WELLCOME!");
+  socket.emit("message", generateMessage("Welcome!"));
   /**Gửi cho tất cả client trừ người gửi sẽ k thấy dc*/
   socket.broadcast.emit("message", "A new user has joined!");
 
@@ -29,17 +30,17 @@ io.on("connection", (socket) => {
     const filter = new Filter();
     if (filter.isProfane(text)) return callback("Profane is not allowed!");
     /**Gửi cho tất cả client & người gửi*/
-    io.emit("updatedText", text);
+    io.emit("message", generateMessage(text));
     callback();
   });
 
   socket.on("disconnect", () => {
     // socket.broadcast.emit("message", "A user has left!");
-    io.emit("message", "A user has left!");
+    io.emit("message", generateMessage("A user has left!"));
   });
   socket.on("sendLocation", ({ latitude, longtitude } = {}, callback) => {
     io.emit(
-      "message",
+      "locationMessage",
       `https://www.google.com/maps?q=${latitude},${longtitude}`
     );
     callback("Location shared!");
