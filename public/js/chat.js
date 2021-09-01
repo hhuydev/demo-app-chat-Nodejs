@@ -14,18 +14,51 @@ const messageTemplate = document.querySelector("#message-template").innerHTML;
 const locationTemplate = document.querySelector(
   "#location-message-template"
 ).innerHTML;
+const sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
 
-// socket.emit("join", { username, room });
+socket.on("roomData", ({ users, room }) => {
+  const html = Mustache.render(sidebarTemplate, {
+    users,
+    room,
+  });
+  document.querySelector("#sidebar").innerHTML = html;
+});
+
+const autoscroll = () => {
+  /**Lấy tin nhắn mới */
+  const $newMessage = $messages.lastElementChild;
+  /**Lấy chiều cao tin nhắn mới */
+  const newMessageStyles = getComputedStyle($newMessage);
+
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+
+  /**Chiều cao thấy dc tin nhắn */
+  const visibleHeight = $messages.offsetHeight;
+
+  /**Chiều cao tổng đoạn chat*/
+  const containerHeight = $messages.scrollHeight;
+
+  /**Chiều cao khi phải scrolled */
+  const scrollOffset = $messages.scrollTop + visibleHeight;
+
+  if (containerHeight - newMessageHeight <= scrollOffset) {
+    $messages.scrollTop = $messages.scrollHeight;
+  }
+};
 
 socket.on("message", (message) => {
   console.log(message);
   /**Dung mustache de render message ra html */
   const html = Mustache.render(messageTemplate, {
+    username: message.username,
     message: message.text,
     /**Format ngay thang nam bang thu vien Moment */
     createdAt: moment(message.createdAt).format("h:m a"),
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 $messageForm.addEventListener("submit", (e) => {
@@ -39,22 +72,24 @@ $messageForm.addEventListener("submit", (e) => {
     $messageFormInput.focus();
     if (error) return console.log(error);
     if (!mytext) return;
-    else console.log(mytext);
+    // else console.log(mytext);
   });
 });
 
-socket.on("updatedText", (message) => {
-  if (!message) return;
-  console.log("This text has been arrived");
-});
+// socket.on("updatedText", (message) => {
+//   if (!message) return;
+//   // console.log("This text has been arrived");
+// });
 
 socket.on("locationMessage", (locationLink) => {
   // console.log(locationText);
   const html = Mustache.render(locationTemplate, {
+    username: locationLink.username,
     locationLink: locationLink.location,
     createdAt: moment(locationLink.createdAt).format("h:m a"),
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 $sendLocationButton.addEventListener("click", () => {

@@ -27,6 +27,7 @@ const removeUser = (id) => {
 const getUser = (id) => {
   const index = users.findIndex((user) => user.id === id);
   if (index !== -1) return users[index];
+  else return undefined;
 };
 
 const getUserInRoom = (roomName) => {
@@ -35,4 +36,4 @@ const getUserInRoom = (roomName) => {
   else return { error: "Can not find users by " + roomName };
 };
 
-module.exports = { addUser, removeUser, getUser, getUserInRoom };
+module.exports = { addUser, removeUser, getUser, getUserInRoom, users };
