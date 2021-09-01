@@ -34,3 +34,5 @@ const getUserInRoom = (roomName) => {
   if (listUserByRoomName.length !== 0) return listUserByRoomName;
   else return { error: "Can not find users by " + roomName };
 };
+
+module.exports = { addUser, removeUser, getUser, getUserInRoom };

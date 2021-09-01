@@ -4,7 +4,6 @@ const $messageFormInput = $messageForm.querySelector("input");
 const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messages = document.querySelector("#messages");
-
 /**get query param from url */
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -16,7 +15,7 @@ const locationTemplate = document.querySelector(
   "#location-message-template"
 ).innerHTML;
 
-socket.emit("join", { username, room });
+// socket.emit("join", { username, room });
 
 socket.on("message", (message) => {
   console.log(message);
@@ -78,4 +77,11 @@ $sendLocationButton.addEventListener("click", () => {
       }
     );
   });
+});
+
+socket.emit("join", { username, room }, (err) => {
+  if (err) {
+    alert(err);
+    location.href = "/";
+  }
 });
