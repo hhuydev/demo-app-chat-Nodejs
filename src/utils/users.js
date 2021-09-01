@@ -24,10 +24,13 @@ const removeUser = (id) => {
   if (index !== -1) return users.splice(index, 1)[0];
 };
 
-addUser({ id: 1, username: "huy", room: "lo11" });
+const getUser = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+  if (index !== -1) return users[index];
+};
 
-console.log(users);
-
-const user = removeUser(1);
-console.log(user);
-console.log(users);
+const getUserInRoom = (roomName) => {
+  const listUserByRoomName = users.filter((user) => user.room === roomName);
+  if (listUserByRoomName.length !== 0) return listUserByRoomName;
+  else return { error: "Can not find users by " + roomName };
+};
